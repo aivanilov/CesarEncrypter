@@ -10,8 +10,20 @@ public class Alphabet {
             'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э',
             'ю', 'я', '.', ',', '"', ':', '-', '!', '?', ' '};
 
-    private List<Character> alphabet = new ArrayList<>();
+    private final List<Character> alphabet = new ArrayList<>();
     private int cryptoKey;
+
+    public int getCryptoKey() {
+        return cryptoKey;
+    }
+
+    public List<Character> getAlphabet() {
+        return alphabet;
+    }
+
+    public void setCryptoKey(int cryptoKey) {
+        this.cryptoKey = cryptoKey;
+    }
 
     public Alphabet(int cryptoKey) {
         if (cryptoKey >= 0 && cryptoKey <= symbols.length) {
@@ -30,14 +42,14 @@ public class Alphabet {
                 '}';
     }
 
-    public Character getEncryptedSymbol(Character a) {
-        int symbolTargetPosition = 0;
+    public Character encryptSymbol(Character a) {
+        int symbolTargetPosition;
         int symbolInitialPosition = alphabet.indexOf(a);
 
         if (!alphabet.contains(a))
             return a;
 
-        if ((symbolInitialPosition + this.cryptoKey) < (symbols.length - 1)) {
+        if ((symbolInitialPosition + this.cryptoKey) < (symbols.length)) {
             symbolTargetPosition = symbolInitialPosition + cryptoKey;
         } else {
             symbolTargetPosition = symbolInitialPosition + cryptoKey - symbols.length;
@@ -46,8 +58,8 @@ public class Alphabet {
         return alphabet.get(symbolTargetPosition);
     }
 
-    public Character getDecryptedSymbol(Character a) {
-        int symbolTargetPosition = 0;
+    public Character decryptSymbol(Character a) {
+        int symbolTargetPosition;
         int symbolInitialPosition = alphabet.indexOf(a);
 
         if (!alphabet.contains(a))

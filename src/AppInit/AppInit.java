@@ -1,6 +1,6 @@
 package AppInit;
 
-import Encrypter.EncryptedText;
+import Encrypter.Text;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,39 +14,60 @@ public class AppInit {
 
     public static void main(String[] args) {
         // Выбрать режим работы программы
-        chooseServiceMode();
-        if (ServiceMode.MODE.getMode() == 0) System.exit(0);
+        do {
+            chooseServiceMode();
+            switch (ServiceMode.MODE.getMode()) {
+                case 1, 2 -> encryptOrDecryptWithCryptoKey();
+                case 3 -> decryptTextByBruteForce();
+                case 0 -> System.exit(0);
+            }
+        } while (true);
+    }
 
-        while (ServiceMode.MODE.getMode() != 0) {
+    private static void decryptTextByBruteForce() {
+        // Выбрать исходный файл и указать ключ шифрования
+        Path pathInitial = selectInitialPath();
+        String text = fileToString(pathInitial);
+        Text encryptedText = new Text(text);
+
+        // Выбрать, куда положить результирующий файл
+        Path pathTarget = selectResultingPath();
+
+        // Расшифровать и создать файл
+        encryptedText.determineCryptoKey();
+        stringToFile(encryptedText.getTargetText(), pathTarget);
+    }
+
+    private static void encryptOrDecryptWithCryptoKey() {
             // Выбрать исходный файл и указать ключ шифрования
             int cryptoKey = selectCryptoKey();
             Path pathInitial = selectInitialPath();
             String text = fileToString(pathInitial);
-            EncryptedText encryptedText = new EncryptedText(text, cryptoKey);
+            Text encryptedText = new Text(text, cryptoKey);
 
             // Выбрать, куда положить результирующий файл
             Path pathTarget = selectResultingPath();
 
             // Зашифровать или расшифровать и создать файл
-            if (ServiceMode.MODE.getMode() == 1) stringToFile(encryptedText.getEncryptedText(), pathTarget);
-            else stringToFile(encryptedText.getDecryptedText(), pathTarget);
-
-            chooseServiceMode();
-        }
+            if (ServiceMode.MODE.getMode() == 1) stringToFile(encryptedText.encryptText(), pathTarget);
+            else stringToFile(encryptedText.decryptText(), pathTarget);
     }
 
     private static void chooseServiceMode() {
         System.out.println("""
                 Добро пожаловать в CesarEncrypter!
                 Пожалуйста, выберите, что вы хотите сделать:
-                1 - зашифровать текст\s
-                2 - расшифровать текст\s
-                0 - закрыть приложение
+                1 - зашифровать текст по ключу\s
+                2 - расшифровать текст по ключу\s
+                3 - расшифровать текст брутфорсом\s
+                4 - расшифровать текст по паттерну (в разработке) \s
+                0 - закрыть приложение\s
                 """);
 
         switch (Integer.parseInt(AppInit.scanner.nextLine())) {
             case 1 -> ServiceMode.MODE.setMode(1);
             case 2 -> ServiceMode.MODE.setMode(2);
+            case 3 -> ServiceMode.MODE.setMode(3);
             default -> ServiceMode.MODE.setMode(0);
         }
 
@@ -61,6 +82,9 @@ public class AppInit {
             System.out.println("Пожалуйста, выберите файл, который желаете расшифровать:");
 
         String result = AppInit.scanner.nextLine();
+
+        System.out.println("Файл выбран успешно.");
+
         return Path.of(result);
     }
 
@@ -96,6 +120,3 @@ public class AppInit {
         System.out.println("Файл успешно сохранён по адресу: " + path);
     }
 }
-
-// /Users/aivanilov/Desktop/JavaRushFiles/sourceText.txt
-// /Users/aivanilov/Desktop/JavaRushFiles/newText.txt
